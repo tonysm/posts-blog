@@ -34,7 +34,7 @@ class BancoDeDados {
      * @return PDO
      */
     private function PDOConnection(){
-        return new PDO("mysql:host=mysql.ntechlocal.com;dbname=dev", "dev", "dev");
+        return new PDO("mysql:host=localhost;dbname=singleton", "root", "");
     }
     /**
      * getInstance
