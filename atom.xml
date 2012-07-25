@@ -1,0 +1,634 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Blog / luizantonio.me]]></title>
+  <link href="http://tonyzrp.github.com/posts-blog/atom.xml" rel="self"/>
+  <link href="http://tonyzrp.github.com/posts-blog/"/>
+  <updated>2012-07-25T16:00:25-03:00</updated>
+  <id>http://tonyzrp.github.com/posts-blog/</id>
+  <author>
+    <name><![CDATA[Tony]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Padrões Criacionais - Factory Method]]></title>
+    <link href="http://tonyzrp.github.com/posts-blog/blog/2012/07/25/padroes-criacionais-factory-method/"/>
+    <updated>2012-07-25T15:47:00-03:00</updated>
+    <id>http://tonyzrp.github.com/posts-blog/blog/2012/07/25/padroes-criacionais-factory-method</id>
+    <content type="html"><![CDATA[<p>Bom, já estou me sentindo em débito com os leitores. Minhas desculpas aos 2 leitores. (kkkk) Brincadeiras a parte, como já falei, vou falar sobre os padrões listados abaixo, os que estão em itálico já foram apresentados, vou marcar o atual com negrito.</p>
+
+<ul>
+<li><em>Singleton</em></li>
+<li><strong>Factory Method</strong></li>
+<li>Abstract Factory</li>
+<li>Injeção de Dependência</li>
+</ul>
+
+
+<p>Então, vamos ao que interessa.</p>
+
+<!-- more -->
+
+
+<h2>Factory Method, o que é isso?</h2>
+
+<p>Como vocês devem ter percebido, existem dois &#8220;Factory&#8220;&#8216;s na listagem e eles são bem diferentes. Vocês vão perceber como são diferentes.</p>
+
+<p>Bem, esse padrão provê uma interface para a criação de familias de objetos. Você delega a instanciação dos seus objetos, ou seja, ele remove a necessidade de especificar as classes concretas.</p>
+
+<h3>Peraê, mas como assim?</h3>
+
+<p>Você encapsula a instanciação da classe concreta. Em outras palavras, você não instancia uma classe usando <strong><em>new MinhaClasse()</em></strong>, você solicita a um método o objeto da classe <em>MinhaClasse</em>.</p>
+
+<h3>Tá, mas porque eu não uso o <em>new</em> direto?</h3>
+
+<p>Existem vários motivos para você não fazer isso. O primeiro é que você vai espalhar pelo seu código a instanciação dessa classe, logo, se você mudar a classe <em>MinhaClasse</em> e quiser usar, por exemplo, <em>MinhaOutraClasse</em> no lugar dela, você teria que alterar em todo o seu código.</p>
+
+<h3>Com grandes poderes vêm grandes responsabilidades</h3>
+
+<p>Mas calma, não vá utilizando esse padrão sempre. Utilize-o somente quando for necessário. Isso é:</p>
+
+<ul>
+<li>Quando você não consegue antecipar qual classe será instanciada;</li>
+<li>Quando você quer que uma classe especifique o objeto dentre suas subclasses;</li>
+</ul>
+
+
+<p>Não entendeu? Vamos ver o diagrama do exemplo que vou codificar:</p>
+
+<p><img src="http://tonyzrp.github.com/posts-blog/images/posts/factory-method-ex1.png" title="UML do que iremos codificar" alt="Exemplo 1 - Diagrama de Classe" /></p>
+
+<p>Percebam que o cliente deve ter acesso aos objetos <em>VoltaDosQueNaoForam</em> e <em>EstouComSorte</em> pelo <em>LivroFactory</em>.</p>
+
+<p>Vamos ao código! O repositório, como falo em posts anteriores, é esse [aqui] (http://github.com/tonyzrp/posts-blog/)</p>
+
+<p>Vamos ao pacote de domínio primeiro:</p>
+
+<figure class='code'><figcaption><span> (Livro.php)</span> <a href='http://tonyzrp.github.com/posts-blog/downloads/code/posts-blog/padroesdeprojeto/criacionais/factorymethod/livros/dominio/Livro.php'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * classe Livro</span>
+</span><span class='line'><span class="sd"> * </span>
+</span><span class='line'><span class="sd"> * @author Luiz Messias &lt;tonyzrp@gmail.com&gt;</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">abstract</span> <span class="k">class</span> <span class="nc">Livro</span> <span class="p">{</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">  * @var String</span>
+</span><span class='line'><span class="sd">  */</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$_autor</span><span class="p">;</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">  * @var String</span>
+</span><span class='line'><span class="sd">  */</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$_titulo</span><span class="p">;</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">  * __construct</span>
+</span><span class='line'><span class="sd">  * </span>
+</span><span class='line'><span class="sd">  * construtor da classe livro</span>
+</span><span class='line'><span class="sd">  * </span>
+</span><span class='line'><span class="sd">  * @param string $titulo titulo do livro</span>
+</span><span class='line'><span class="sd">  * @param string $autor autor do livro</span>
+</span><span class='line'><span class="sd">  */</span>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$titulo</span><span class="p">,</span> <span class="nv">$autor</span><span class="p">){</span>
+</span><span class='line'>      <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_autor</span> <span class="o">=</span> <span class="nv">$autor</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_titulo</span> <span class="o">=</span> <span class="nv">$titulo</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">echo</span> <span class="s2">&quot;Título: &quot;</span> <span class="o">.</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_titulo</span> <span class="o">.</span> <span class="s2">&quot;; autor: &quot;</span> <span class="o">.</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_autor</span> <span class="o">.</span> <span class="s2">&quot;; Classe: &quot;</span> <span class="o">.</span> <span class="nb">get_class</span><span class="p">(</span><span class="nv">$this</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">  * getAutor</span>
+</span><span class='line'><span class="sd">  * </span>
+</span><span class='line'><span class="sd">  * retorna o nome do autor</span>
+</span><span class='line'><span class="sd">  * </span>
+</span><span class='line'><span class="sd">  * @return String</span>
+</span><span class='line'><span class="sd">  */</span>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getAutor</span><span class="p">(){</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_autor</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">  * getTitulo</span>
+</span><span class='line'><span class="sd">  * </span>
+</span><span class='line'><span class="sd">  * retorn o titulo do livro</span>
+</span><span class='line'><span class="sd">  * </span>
+</span><span class='line'><span class="sd">  * @return String</span>
+</span><span class='line'><span class="sd">  */</span>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getTitulo</span><span class="p">(){</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_titulo</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">  * setTitulo</span>
+</span><span class='line'><span class="sd">  * </span>
+</span><span class='line'><span class="sd">  * altera o titulo do objeto</span>
+</span><span class='line'><span class="sd">  * </span>
+</span><span class='line'><span class="sd">  * @param String $titulo novo titulo</span>
+</span><span class='line'><span class="sd">  * @return void</span>
+</span><span class='line'><span class="sd">  */</span>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">setTitulo</span><span class="p">(</span> <span class="nx">String</span> <span class="nv">$titulo</span> <span class="p">){</span>
+</span><span class='line'>      <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_titulo</span> <span class="o">=</span> <span class="nv">$titulo</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">  * setAutor</span>
+</span><span class='line'><span class="sd">  * </span>
+</span><span class='line'><span class="sd">  * altera o autor do objeto</span>
+</span><span class='line'><span class="sd">  * </span>
+</span><span class='line'><span class="sd">  * @param String $autor novo autor</span>
+</span><span class='line'><span class="sd">  * @return void</span>
+</span><span class='line'><span class="sd">  */</span>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">setAutor</span><span class="p">(</span> <span class="nx">String</span> <span class="nv">$autor</span><span class="p">){</span>
+</span><span class='line'>      <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_autor</span> <span class="o">=</span> <span class="nv">$autor</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span> (EstouComSorte.php)</span> <a href='http://tonyzrp.github.com/posts-blog/downloads/code/posts-blog/padroesdeprojeto/criacionais/factorymethod/livros/dominio/EstouComSorte.php'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">require_once</span> <span class="s2">&quot;Livro.php&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">EstouComSorte</span> <span class="k">extends</span> <span class="nx">Livro</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">//implementação da especialização</span>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(){</span>
+</span><span class='line'>      <span class="nv">$titulo</span> <span class="o">=</span> <span class="s2">&quot;Estou com sorte&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$autor</span> <span class="o">=</span> <span class="s2">&quot;Fulano da Silva&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="nv">$titulo</span><span class="p">,</span> <span class="nv">$autor</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span> (VoltaDosQueNaoForam.php)</span> <a href='http://tonyzrp.github.com/posts-blog/downloads/code/posts-blog/padroesdeprojeto/criacionais/factorymethod/livros/dominio/VoltaDosQueNaoForam.php'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'><span class="k">require_once</span> <span class="s2">&quot;Livro.php&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">VoltaDosQueNaoForam</span> <span class="k">extends</span> <span class="nx">Livro</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">//implementação da especialização</span>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(){</span>
+</span><span class='line'>      <span class="nv">$titulo</span> <span class="o">=</span> <span class="s2">&quot;A Volta dos que nao foram&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$autor</span> <span class="o">=</span> <span class="s2">&quot;Fulano da Tal&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="nv">$titulo</span><span class="p">,</span> <span class="nv">$autor</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Agora, vamos a interface Factory Method e ao Factory Livros:</p>
+
+<figure class='code'><figcaption><span> (ILivroFactory.php)</span> <a href='http://tonyzrp.github.com/posts-blog/downloads/code/posts-blog/padroesdeprojeto/criacionais/factorymethod/livros/ILivroFactory.php'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'><span class="k">interface</span> <span class="nx">ILivroFactory</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">getLivro</span><span class="p">(</span> <span class="nv">$id</span> <span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>File /home/luiz/Área de Trabalho/ruby-sites/octopress/source/downloads/code/posts-blog/padroesdeprojeto/criacionais/factorymethod/livros/dominio/LivroFactory.php could not be found</p>
+
+<p>Ok, agora vamos ao <em>index.php</em> (exemplo de código cliente):</p>
+
+<p>File /home/luiz/Área de Trabalho/ruby-sites/octopress/source/downloads/code/posts-blog/padroesdeprojeto/criacionais/factorymethod/livros/index.php could not be found</p>
+
+<p>Vejam que para pegar um objeto EstouComSorte ou VoltaDosQueNaoForam eu não utilizo no código cliente a diretiva <em>new</em>, eu peço ao Factory o objeto que quero.</p>
+
+<p>Bom, qualquer dúvida utilizem os comentários.</p>
+
+<p>Até a próxima!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Padrões Criacionais - Singleton]]></title>
+    <link href="http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-criacionais-singleton/"/>
+    <updated>2012-07-20T13:14:00-03:00</updated>
+    <id>http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-criacionais-singleton</id>
+    <content type="html"><![CDATA[<p>Hoje vamos falar de um padrão muito legal, o Singleton. Esse padrão é muito usado e conhecido no mundo JAVA, mas não é muito aconselhado no ambiente web. O problema é o seguinte: Digamos que você queria que uma classe tenha uma e somente uma instância. Pois é, o singleton surge exatamente para garantir que isso aconteça.</p>
+
+<!-- more -->
+
+
+<h3>Mas, como assim uma instância? Qual o problema em ter mais de uma instância?</h3>
+
+<p>Digamos que você tenha uma classe de BancoDeDados. Essa classe estabelece uma conexão com o banco de dados e também é responsável por fechar essa conexão. Nessa classe também é possível forçar uma nova conexão.</p>
+
+<p>Vamos ver o código dessa classe:</p>
+
+<div><script src='https://gist.github.com/3151195.js?file=BancoDeDados.php'></script>
+<noscript><pre><code>&lt;?php
+/**
+ * BancoDeDados
+ * 
+ *  Essa classe estabelece uma conexão com o banco de dados e também 
+ *  é responsável por fechar essa conexão. Nessa classe também é possível forçar uma nova conexão.
+ *
+ * @author Luiz Messias &lt;tonyzrp@gmail.com&gt;
+ * 
+ */
+class BancoDeDados {
+    /**
+     * @static
+     * @var BancoDeDados
+     */
+    private static $instance;
+    /**
+     * @var PDO
+     */
+    private $conn;
+    /**
+     * __construct
+     * o construtor será privado para evitar que essa classe seja instanciada
+     *
+     * @return void
+     */
+    private function __construct(){
+        //qualquer implementação de construtor pode ser feita aqui
+        $this-&gt;conn = $this-&gt;PDOConnection();
+    }
+    /**
+     * PDOConnect
+     *
+     * @return PDO
+     */
+    private function PDOConnection(){
+        return new PDO(&quot;mysql:host=localhost;dbname=singleton&quot;, &quot;root&quot;, &quot;&quot;);
+    }
+    /**
+     * getInstance
+     *
+     * @static
+     * @return BancoDeDados
+     */
+    public static function getInstance(){
+        if(!isset(self::$instance))
+            self::$instance = new self();
+            
+        return self::$instance;
+    }
+    /**
+     * connect
+     *
+     * @return PDO
+     */
+    public function connect(){
+        return $this-&gt;conn;
+    }
+    /**
+     * forceReconnect
+     *  esse método força um reconnect na conexão do singleton, caso seja necessário
+     *
+     * @return PDO
+     */
+    public function forceReconnect(){
+        self::$instance-&gt;conn = $this-&gt;PDOConnection();
+        
+        return self::$instance-&gt;conn;
+    }
+}</code></pre></noscript></div>
+
+
+<p>Certo, vou tentar explicar essa classe.</p>
+
+<ul>
+<li><strong>linha 16</strong>: essa é a única instância da Classe Banco de Dados;</li>
+<li><strong>linha 20</strong>: A instância da class possui a conexão com o banco;</li>
+<li><strong>linha 27</strong>: O construtor foi escrito como <em>private</em> para que não seja possível instanciá-la;</li>
+<li><strong>linha 29</strong>: Como o construtor será executado apenas uma vez, essa conexão será única para a aplicação toda, a não ser que o cliente force uma nova conexão;</li>
+<li><strong>linha 36</strong>: Esse método simplesmente retorna uma nova conexão com o PDO;</li>
+<li><strong>linha 45</strong>: Como tornamos o construtor <em>private</em> precisamos de um ponto de acesso ao objeto, esse é o nosso ponto de acesso. Nesse método, verificamos se existe a instância. Se não existir, ela é criada. Sendo retornada logo em seguida.</li>
+<li><strong>linha 56</strong>: Método que o cliente usará para conectar-se conseguir uma conexão com o Banco.</li>
+<li><strong>linha 65</strong>: Método que força a conexão com o banco. Perceba que ele muda a conexão da instância do singleton. Todos os objetos dessa instância receberão essa nova conexão.</li>
+</ul>
+
+
+<p>Bom, é isso. Eu fiz um exemplo de código cliente com alguns testes, só é descomentar os testes para ver os retornos.</p>
+
+<p><strong>Lembrete</strong>: <strong>&#8221;==&#8221;</strong> em objetos retorna <em>true</em> se os objetos tem os mesmos atributos e valores e se forem instâncias da mesma classe. Já o <strong>&#8221;===&#8221;</strong> retorna <em>true</em> se, e somente se, forem instâncias do mesmo objeto.</p>
+
+<div><script src='https://gist.github.com/3151195.js?file=index.php'></script>
+<noscript><pre><code>&lt;?php
+
+    require &quot;BancoDeDados.php&quot;;
+    
+    $Banco = BancoDeDados::getInstance();
+    $Banco2 = BancoDeDados::getInstance();
+    
+    //var_dump($Banco === $Banco2); // output true
+    
+    $conn = $Banco-&gt;connect();
+    $conn2 = $Banco2-&gt;connect();
+    
+    //var_dump( $conn === $conn2 ); // output true
+    
+    //forçando o reconnect
+    $conn2 = $Banco2-&gt;forceReconnect();
+    
+    //var_dump( $conn === $conn2 ); // output false
+    
+    $Banco3 = BancoDeDados::getInstance();
+    
+    //var_dump(($Banco === $Banco3) &amp;&amp; ($Banco2 === $Banco3)); //output true
+    
+    $conn3 = $Banco3-&gt;connect();
+    
+    //var_dump($conn === $conn2); // output false
+    //var_dump($conn2 === $conn3); // output true
+    
+    $conn4 = $Banco-&gt;connect();
+    
+    //$conn e $conn4 foram recuperadas pelo mesmo objeto ($Banco), mas eu forcei o reconnect no singleton
+    //var_dump($conn === $conn4); //output false
+    //var_dump($conn2 === $conn4); //output true
+    //var_dump($conn3 === $conn4); //output true</code></pre></noscript></div>
+
+
+<p>É isso, espero ter ajudado alguém com isso. Se fiz alguma cagada aqui, podem descer o verbo nos comentários. (hehe)</p>
+
+<p>Até a próxima!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Padrões de Projeto - Introdução]]></title>
+    <link href="http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-de-projeto-introducao/"/>
+    <updated>2012-07-20T11:56:00-03:00</updated>
+    <id>http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-de-projeto-introducao</id>
+    <content type="html"><![CDATA[<p>Olá, galera. Olha eu aqui mais uma vez pra falar de um tema que acho muito interessante: Padrões de Projeto! (ou “Design Patterns”, se preferir) Bom, esse é um tema muito conhecido por programadores JAVA, mas adivinha só, não é apenas em JAVA que podemos aplicar esses padrões, eles podem ser aplicados perfeitamente em PHP ou qualquer outra linguagem com suporte a orientação a objetos, acredito eu. Claro, existem exceções, mas não vamos falar sobre isso agora.</p>
+
+<p>Estou estudando Padrões de Projeto e pra aprender mais, resolvi tentar descrever os padrões como os entendi. Por isso, posso estar errado em alguma colocação. Ou seja, os comentários são bem vindos! Mal posso esperar pelos debates nos comentários! (hehe)</p>
+
+<!-- more -->
+
+
+<p>Só pra lembrar que os códigos apresentados aqui estão no meu github, nesse repositório <a href="https://github.com/tonyzrp/posts-blog">aqui</a>.</p>
+
+<h2>O que são esses Padrões de Projeto?</h2>
+
+<p>Outro dia comprei um livro muito legal (esse <a href="http://www.linuxmall.com.br/produto/livro-objetos-php-padroes-e-pratica.html" title="link do livro no linuxmall">aqui</a>) que mostra vários padrões de projeto, assim como fala sobre <a href="http://phpunit.sourceforge.net/">PHPUnit</a> (testes automatizados), <a href="http://www.phpdoc.org/">PHPDoc</a> (documentação de código), <a href="http://pt.wikipedia.org/wiki/CVS">CVS</a> (Controle de versão), enfim, o livro é muito bom e recomendo a leitura!</p>
+
+<p>Tá, mas ainda não respondi a pergunta. Vamos lá, Padrões de Projeto são soluções documentadas para problemas recorrentes no desenvolvimento de software. Segundo o <a href="http://pt.wikipedia.org/wiki/Padr%C3%A3o_de_projeto_de_software">Wikipédia</a>:</p>
+
+<blockquote><p>“Um Padrão de Projeto de Software ou Padrão de Desenho de Software, também muito conhecido pelo termo original em inglês, Design Pattern, descreve uma solução geral reutilizável para um problema recorrente no desenvolvimento de sistemas de software orientados a objetos. Não é um código final, é uma descrição ou modelo de como resolver o problema do qual trata, que pode ser usada em muitas situações diferentes. Os Padrões de Projeto normalmente definem as relações e interações entre as classes ou objetos, sem especificar os detalhes das classes ou objetos envolvidos, ou seja, estão num nível de generalidade mais alto.”</p></blockquote>
+
+<p>Algo muito comum nos desenvolvedores PHP é a pressa para desenvolver. Arrisco dizer que não é nem o desenvolvedor que é apressado, mas os prazos dos projetos não nos dão espaço para pensar muito no que fazer e o desenvolvedor já vai logo cuspindo código antes de pensar nos problemas da implementação daquele determinado código, em quê aquela pequena alteração afeta o sistema. Claro que a experiência do desenvolvedor também influencia muito nisso.</p>
+
+<p>Bem, vamos logo ao que interessa!</p>
+
+<h2>Quais os padrões que existem?</h2>
+
+<p>Existem N padrões e esse número aumenta com o passar do tempo, pois a medida que os problemas vão acontecendo, também surgem novas soluções que podem ser documentadas, criando-se um padrão. Na verdade, muitos dos padrões que veremos podem até já estar sendo usados por vocês, mas vocês nem sabiam.</p>
+
+<p>Existem basicamente três tipos de padrões de projeto, são eles:</p>
+
+<ul>
+<li>Criacionais</li>
+<li>Estruturais</li>
+<li>Comportamentais</li>
+</ul>
+
+
+<p>Vamos começar pelos padrões criacionais. Aqui, iremos abordar esse padrões:</p>
+
+<ul>
+<li>Singleton</li>
+<li>Factory Method</li>
+<li>Abstract Factory</li>
+<li>Injeção de Dependência</li>
+</ul>
+
+
+<p>Esses são os padrões que mais gostei de conhecer e é sobre eles que vamou falar nos próximos posts.</p>
+
+<p>Até a próxima!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Introdução ao Controle de Versão com SVN - parte 1]]></title>
+    <link href="http://tonyzrp.github.com/posts-blog/blog/2012/07/16/introducao-ao-controle-de-versao-com-svn-parte-1/"/>
+    <updated>2012-07-16T18:39:00-03:00</updated>
+    <id>http://tonyzrp.github.com/posts-blog/blog/2012/07/16/introducao-ao-controle-de-versao-com-svn-parte-1</id>
+    <content type="html"><![CDATA[<p><img src="http://tonyzrp.github.com/posts-blog/images/posts/header-svn-parte-1.png" title="Modelo de desenvolvimento centralizado" alt="Exemplo de desenvolvimento com SVN" /></p>
+
+<p>Bom, resolvi começar com um post que escrevi a algum tempo e postei esses dias no <a href="http://webmatinal.org/" title="WebMatinal">webmatinal</a>. Vamos falar sobre controle de versão e, para exemplificar, iremos utilizar o SVN pela linha de comando. Como usuário iniciante de Linux, venho tentando me adaptar ao ambiente já tem um tempo. Ainda sou muito noob, mas é assim mesmo.</p>
+
+<!-- more -->
+
+
+<p>Bom, sem mais lorotas, vamos ao que interessa. Uma das primeiras coisas (leia-se ferramentas) que tive contato logo quando comecei a estagiar/trabalhar com desenvolvimento foi o SVN. No começo, não entendia muito bem a coisa toda, achava que era só um lugar onde guardávamos o código. Leigo engano (e bota “leigo” nisso!). Com o tempo (e muitos conflitos de versão que explicarei mais adiante), percebi a verdadeira importância do controle de versão. Não é só um lugar onde nosso código fica. Achava isso por conta do modelo centralizado do SVN, onde é necessário um repositório central para guardar o código.</p>
+
+<p>Acho importante entender alguns conceitos, pois PRECISAMOS ter um bom controle do código que escrevemos. Não só código, como qualquer documento que produzimos precisa estar sob algum controle de versão. Digo “PRECISAMOS” pra enfatizar a necessidade da utilização de versionamento. Isso nos proporciona um histórico do desenvolvimento do software (ou arquivo). Segundo o wikipédia:</p>
+
+<blockquote><p>Um sistema de controle de versão (ou versionamento), <a href="http://en.wikipedia.org/wiki/Version_control_system" title="Modelo centralizado de Controle de Versão">VCS</a> (do inglês version control system) ou ainda SCM (do inglês source code management) na função prática da <a href="http://pt.wikipedia.org/wiki/Ci%C3%AAncia_da_Computa%C3%A7%C3%A3o" title="Ciência da Computação">Ciência da Computação</a> e da <a href="http://pt.wikipedia.org/wiki/Engenharia_de_Software" title="Engenharia de Software">Engenharia de Software</a>, é um <a href="http://pt.wikipedia.org/wiki/Software" title="Software">software</a> com a finalidade de gerenciar diferentes <a href="http://pt.wikipedia.org/wiki/Vers%C3%A3o" title="Versões de Software">versões</a> no desenvolvimento de um documento qualquer.</p></blockquote>
+
+<p>Para exemplos iremos utilizar o Subversion, ou <a href="http://pt.wikipedia.org/wiki/Subversion" title="SVN">SVN</a> (como já citei acima). Ele é um software de controle de versão centralizado, isso quer dizer que necessita de um repositório central para armazenar seu código. A ideia é essa:</p>
+
+<p><img src="http://tonyzrp.github.com/posts-blog/images/posts/controle-versao-svn-centralizado-300x280.png" title="Modelo de desenvolvimento centralizado" alt="Desenvolvimento com repositório central" /></p>
+
+<p>Essa imagem já nos traz dois dos principais comandos do SVN: <strong>commit</strong> e <strong>update</strong>. Para começar a falar dos comandos, vamos entender o que é uma working copy. Como já falamos, nosso código fica centralizado, ou seja, ele é armazenado em um servidor central. Para fazer as alterações no nosso código, precisamos primeiro baixar a última versão do código na nossa máquina para, então, efetuar as alterações e mandar de volta para o servidor. Quando baixamos o código do servidor para a nossa máquina, estamos criando uma “working copy”. Que fique claro que a maior parte do código no servidor deve ter sido testado!</p>
+
+<p>Vejamos agora alguns comandos:</p>
+
+<ul>
+<li><strong>checkout</strong>: Nada mais é do que criar uma working copy de um projeto do repositório na sua máquina (onde você irá desenvolver);</li>
+<li><strong>commit</strong>: Serve para mandar suas alterações para o repositório (como mostra a figura);</li>
+<li><strong>update</strong>: Atualiza sua working copy com o repositório. Ou seja, traz atualizações do repositório para a sua working copy;</li>
+<li><strong>status</strong>: Retorna o estado de seus arquivos na working copy, qualquer alteração nos arquivos na sua working copy  vão aparecer com esse comando;</li>
+<li><strong>add</strong>: Adiciona arquivos que não estão no repositório.</li>
+</ul>
+
+
+<p>Já conhecemos alguns dos principais comandos do SVN, vamos brincar um pouco com um exemplo. Não vou falar da instalação do SVN aqui, isso é assunto para outro post. Para exemplificar, digamos que eu tenha um repositório (lugar no servidor onde eu armazeno meu código) limpo, zerado, novinho em folha e quero começar a desenvolver o projeto. Qual a primeira coisa que devemos fazer?
+Respondeu certo que falou “o checkout”. Mas, vamos primeiro a estrutura padrão do repositório.</p>
+
+<ul>
+<li><strong>/</strong>    - raiz do repositório</li>
+<li><strong>/trunk/</strong>    - linha principal de desenvolvimento do repositório (local onde o código fica armazenado)</li>
+<li><strong>/tags/</strong>    - a medida que vamos desenvolvendo e implantando os softwares, versões são criadas. Essas devem ser armazenadas aqui.</li>
+<li><strong>/branches/</strong>    - local onde fica armazenado o código durante o desenvolvimento. Falaremos sobre branches é uma outra oportunidade.</li>
+</ul>
+
+
+<p>Vamos, então, fazer o checkout e começar a desenvolver nosso projeto. Para o exemplo, não iremos utilizar o conceito de branches, vamos trabalhar direto no trunk, pois, como disse, falaremos sobre branches mais adiante. O código para o checkout:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd /var/www/
+</span><span class='line'>$ svn checkout [URL do repositorio]/trunk nome\_da\_working\_copy</span></code></pre></td></tr></table></div></figure>
+
+
+<p>O diretório <strong>/var/www/</strong> é o diretório raiz do meu apache, onde estão os meus projetos. Primeiro eu vou pro meu diretório raiz e em seguinda uso o <em>“svn checkout”</em> se tudo estiver correto, o svn irá criar a pasta nome_da_working_copy no meu diretório de projetos, ficando assim: <strong>/var/www/nome_da_working_copy</strong>.</p>
+
+<p>Pronto! Já tenho uma cópia do projeto. Agora, crie um arquivo na sua <em>working copy</em> chamado <strong>README.txt</strong> e coloque um texto qualquer dentro deste arquivo. Uma vez feito isso, vamos verificar o estado da nossa working copy. Como fazemos isso? Com o comando <strong>status</strong>.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd /var/www/nome\_da\_working\_copy/
+</span><span class='line'>$ svn status</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Feito isso, o terminal deve retornar isso:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ ? README.txt</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Essa interrogação ai quer dizer que esse arquivo existe na sua <em>working copy</em>, mas não existe no repositório. Se fizermos o <strong>commit</strong> agora, nada será alterado no servido, ou seja, esse arquivo não será enviado para o repositório, porquê ele ainda não existe lá. Precisamos, então, adicionar esse arquivo no repositório. Para isso, utilizamos o comando <strong>add</strong>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd /var/www/nome\_da\_working\_copy/
+</span><span class='line'>$ svn add README.txt</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Agora, o SVN irá avisar que o arquivo foi adicionado ao servidor, mas ele ainda não pode ser encontrado lá, pois só existe na sua <em>working copy</em>. Terminadas as alterações, vamos fazer um <strong>commit</strong> e mandar essas alterações para o repositório. Esse comando é sempre utilizado com o parâmetro “-m” seguido de uma mensagem embrulhada por “”, como mostra o exemplo:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd /var/www/nome\_da\_working\_copy/
+</span><span class='line'>$ svn commit -m "criação do arquivo README.txt para descrição do projeto"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Pronto! Nosso arquivo README.txt agora está no repositório com nossas alterações. Digamos agora que outro desenvolvedor alterou esse arquivo (na <em>working copy</em> dele) e fez o commit com as alterações. Agora, você quer alterar esse arquivo novamente. Se você fizesse isso direto na sua <em>working copy</em> e fosse fazer um commit, daria erro, pois o seu arquivo está numa versão diferente do que se encontra no repositório. Isso é chamado de “conflito de versões”. Para alterar o arquivo, primeiro é necessário possuir a última versão do mesmo. Para isso, usamos o comando <strong>update</strong> antes de fazer qualquer alteração no arquivo. (<strong>atenção</strong>: esse comando deve ser executando antes de qualquer commit, os conflitos devem ocorrer na sua working copy, você resolve e manda pro servidor):</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd /var/www/nome\_da\_working\_copy/
+</span><span class='line'>$ svn update</span></code></pre></td></tr></table></div></figure>
+
+
+<p>O SVN nos trará a nova versão do arquivo README.txt. Agora, nós alteramos esse arquivo e adicionamos mais conteúdo. Ao fazer o <strong>status</strong> irá aparecer um “M” no lugar da “?” (interrogação), indicando que o arquivo foi alterado na sua <em>working copy</em>. Diferente da criação de um arquivo, na alteração não precisamos adicionar o arquivo ao repositório novamente. Basta apenas enviar as alterações. Para isso, vamos usar o <strong>commit</strong> novamente:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd /var/www/nome\_da\_working\_copy/
+</span><span class='line'>$ svn commit -m "alteração do arquivo README.txt para acrescentar mais conteúdo."</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Lembre-se sempre de descrever o commit na mensagem para que, posteriormente, possamos saber o que foi feito no commit apenas lendo a mensagem, sem ter que olhar quais arquivos foram alterados no commit e quais alterações foram feitas nesses arquivos.</p>
+
+<p>Bom, visto que é o meu primeiro post aqui, acho que já falei bastante, né?! (hehe) Mas por ora, ficamos por aqui. Espero não ter falado nenhuma bobeira por aqui, mas se falei, sintam-se à vontade para corrigir nos comentários. Nos vemos no próximo post, neste mesmo canal. (hehe)</p>
+
+<p>Até a próxima!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Olá, mundo!]]></title>
+    <link href="http://tonyzrp.github.com/posts-blog/blog/2012/07/14/ola/"/>
+    <updated>2012-07-14T13:19:00-03:00</updated>
+    <id>http://tonyzrp.github.com/posts-blog/blog/2012/07/14/ola</id>
+    <content type="html"><![CDATA[<p>Opa, galera, beleza? Esse é o primeiro post aqui no meu blog. Estou usando o Octopress, falarei aqui também sobre ele.</p>
+
+<p>Esse post é mais pra saber se eu tô fazendo isso direito. hehe</p>
+
+<p>Até a próxima!</p>
+]]></content>
+  </entry>
+  
+</feed>

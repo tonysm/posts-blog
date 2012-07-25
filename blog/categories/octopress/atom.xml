@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Octopress | Blog / luizantonio.me]]></title>
+  <link href="http://tonyzrp.github.com/posts-blog/blog/categories/octopress/atom.xml" rel="self"/>
+  <link href="http://tonyzrp.github.com/posts-blog/"/>
+  <updated>2012-07-25T16:00:25-03:00</updated>
+  <id>http://tonyzrp.github.com/posts-blog/</id>
+  <author>
+    <name><![CDATA[Tony]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Olá, mundo!]]></title>
+    <link href="http://tonyzrp.github.com/posts-blog/blog/2012/07/14/ola/"/>
+    <updated>2012-07-14T13:19:00-03:00</updated>
+    <id>http://tonyzrp.github.com/posts-blog/blog/2012/07/14/ola</id>
+    <content type="html"><![CDATA[<p>Opa, galera, beleza? Esse é o primeiro post aqui no meu blog. Estou usando o Octopress, falarei aqui também sobre ele.</p>
+
+<p>Esse post é mais pra saber se eu tô fazendo isso direito. hehe</p>
+
+<p>Até a próxima!</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: desenvolvimento | Blog / luizantonio.me]]></title>
+  <link href="http://tonyzrp.github.com/posts-blog/blog/categories/desenvolvimento/atom.xml" rel="self"/>
+  <link href="http://tonyzrp.github.com/posts-blog/"/>
+  <updated>2012-07-25T16:00:25-03:00</updated>
+  <id>http://tonyzrp.github.com/posts-blog/</id>
+  <author>
+    <name><![CDATA[Tony]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Padrões Criacionais - Singleton]]></title>
+    <link href="http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-criacionais-singleton/"/>
+    <updated>2012-07-20T13:14:00-03:00</updated>
+    <id>http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-criacionais-singleton</id>
+    <content type="html"><![CDATA[<p>Hoje vamos falar de um padrão muito legal, o Singleton. Esse padrão é muito usado e conhecido no mundo JAVA, mas não é muito aconselhado no ambiente web. O problema é o seguinte: Digamos que você queria que uma classe tenha uma e somente uma instância. Pois é, o singleton surge exatamente para garantir que isso aconteça.</p>
+
+<!-- more -->
+
+
+<h3>Mas, como assim uma instância? Qual o problema em ter mais de uma instância?</h3>
+
+<p>Digamos que você tenha uma classe de BancoDeDados. Essa classe estabelece uma conexão com o banco de dados e também é responsável por fechar essa conexão. Nessa classe também é possível forçar uma nova conexão.</p>
+
+<p>Vamos ver o código dessa classe:</p>
+
+<p><div><script src='https://gist.github.com/3151195.js?file=BancoDeDados.php'></script>
+<noscript><pre><code>&lt;?php
+/**
+ * BancoDeDados
+ * 
+ *  Essa classe estabelece uma conexão com o banco de dados e também 
+ *  é responsável por fechar essa conexão. Nessa classe também é possível forçar uma nova conexão.
+ *
+ * @author Luiz Messias &lt;tonyzrp@gmail.com&gt;
+ * 
+ */
+class BancoDeDados {
+    /**
+     * @static
+     * @var BancoDeDados
+     */
+    private static $instance;
+    /**
+     * @var PDO
+     */
+    private $conn;
+    /**
+     * __construct
+     * o construtor será privado para evitar que essa classe seja instanciada
+     *
+     * @return void
+     */
+    private function __construct(){
+        //qualquer implementação de construtor pode ser feita aqui
+        $this-&gt;conn = $this-&gt;PDOConnection();
+    }
+    /**
+     * PDOConnect
+     *
+     * @return PDO
+     */
+    private function PDOConnection(){
+        return new PDO(&quot;mysql:host=localhost;dbname=singleton&quot;, &quot;root&quot;, &quot;&quot;);
+    }
+    /**
+     * getInstance
+     *
+     * @static
+     * @return BancoDeDados
+     */
+    public static function getInstance(){
+        if(!isset(self::$instance))
+            self::$instance = new self();
+            
+        return self::$instance;
+    }
+    /**
+     * connect
+     *
+     * @return PDO
+     */
+    public function connect(){
+        return $this-&gt;conn;
+    }
+    /**
+     * forceReconnect
+     *  esse método força um reconnect na conexão do singleton, caso seja necessário
+     *
+     * @return PDO
+     */
+    public function forceReconnect(){
+        self::$instance-&gt;conn = $this-&gt;PDOConnection();
+        
+        return self::$instance-&gt;conn;
+    }
+}</code></pre></noscript></div>
+</p>
+
+<p>Certo, vou tentar explicar essa classe.</p>
+
+<ul>
+<li><strong>linha 16</strong>: essa é a única instância da Classe Banco de Dados;</li>
+<li><strong>linha 20</strong>: A instância da class possui a conexão com o banco;</li>
+<li><strong>linha 27</strong>: O construtor foi escrito como <em>private</em> para que não seja possível instanciá-la;</li>
+<li><strong>linha 29</strong>: Como o construtor será executado apenas uma vez, essa conexão será única para a aplicação toda, a não ser que o cliente force uma nova conexão;</li>
+<li><strong>linha 36</strong>: Esse método simplesmente retorna uma nova conexão com o PDO;</li>
+<li><strong>linha 45</strong>: Como tornamos o construtor <em>private</em> precisamos de um ponto de acesso ao objeto, esse é o nosso ponto de acesso. Nesse método, verificamos se existe a instância. Se não existir, ela é criada. Sendo retornada logo em seguida.</li>
+<li><strong>linha 56</strong>: Método que o cliente usará para conectar-se conseguir uma conexão com o Banco.</li>
+<li><strong>linha 65</strong>: Método que força a conexão com o banco. Perceba que ele muda a conexão da instância do singleton. Todos os objetos dessa instância receberão essa nova conexão.</li>
+</ul>
+
+
+<p>Bom, é isso. Eu fiz um exemplo de código cliente com alguns testes, só é descomentar os testes para ver os retornos.</p>
+
+<p><strong>Lembrete</strong>: <strong>"=="</strong> em objetos retorna <em>true</em> se os objetos tem os mesmos atributos e valores e se forem instâncias da mesma classe. Já o <strong>"==="</strong> retorna <em>true</em> se, e somente se, forem instâncias do mesmo objeto.</p>
+
+<p><div><script src='https://gist.github.com/3151195.js?file=index.php'></script>
+<noscript><pre><code>&lt;?php
+
+    require &quot;BancoDeDados.php&quot;;
+    
+    $Banco = BancoDeDados::getInstance();
+    $Banco2 = BancoDeDados::getInstance();
+    
+    //var_dump($Banco === $Banco2); // output true
+    
+    $conn = $Banco-&gt;connect();
+    $conn2 = $Banco2-&gt;connect();
+    
+    //var_dump( $conn === $conn2 ); // output true
+    
+    //forçando o reconnect
+    $conn2 = $Banco2-&gt;forceReconnect();
+    
+    //var_dump( $conn === $conn2 ); // output false
+    
+    $Banco3 = BancoDeDados::getInstance();
+    
+    //var_dump(($Banco === $Banco3) &amp;&amp; ($Banco2 === $Banco3)); //output true
+    
+    $conn3 = $Banco3-&gt;connect();
+    
+    //var_dump($conn === $conn2); // output false
+    //var_dump($conn2 === $conn3); // output true
+    
+    $conn4 = $Banco-&gt;connect();
+    
+    //$conn e $conn4 foram recuperadas pelo mesmo objeto ($Banco), mas eu forcei o reconnect no singleton
+    //var_dump($conn === $conn4); //output false
+    //var_dump($conn2 === $conn4); //output true
+    //var_dump($conn3 === $conn4); //output true</code></pre></noscript></div>
+</p>
+
+<p>É isso, espero ter ajudado alguém com isso. Se fiz alguma cagada aqui, podem descer o verbo nos comentários. (hehe)</p>
+
+<p>Até a próxima!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Padrões de Projeto - Introdução]]></title>
+    <link href="http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-de-projeto-introducao/"/>
+    <updated>2012-07-20T11:56:00-03:00</updated>
+    <id>http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-de-projeto-introducao</id>
+    <content type="html"><![CDATA[<p>Olá, galera. Olha eu aqui mais uma vez pra falar de um tema que acho muito interessante: Padrões de Projeto! (ou “Design Patterns”, se preferir) Bom, esse é um tema muito conhecido por programadores JAVA, mas adivinha só, não é apenas em JAVA que podemos aplicar esses padrões, eles podem ser aplicados perfeitamente em PHP ou qualquer outra linguagem com suporte a orientação a objetos, acredito eu. Claro, existem exceções, mas não vamos falar sobre isso agora.</p>
+
+<p>Estou estudando Padrões de Projeto e pra aprender mais, resolvi tentar descrever os padrões como os entendi. Por isso, posso estar errado em alguma colocação. Ou seja, os comentários são bem vindos! Mal posso esperar pelos debates nos comentários! (hehe)</p>
+
+<!-- more -->
+
+
+<p>Só pra lembrar que os códigos apresentados aqui estão no meu github, nesse repositório <a href="https://github.com/tonyzrp/posts-blog">aqui</a>.</p>
+
+<h2>O que são esses Padrões de Projeto?</h2>
+
+<p>Outro dia comprei um livro muito legal (esse <a href="http://www.linuxmall.com.br/produto/livro-objetos-php-padroes-e-pratica.html" title="link do livro no linuxmall">aqui</a>) que mostra vários padrões de projeto, assim como fala sobre <a href="http://phpunit.sourceforge.net/">PHPUnit</a> (testes automatizados), <a href="http://www.phpdoc.org/">PHPDoc</a> (documentação de código), <a href="http://pt.wikipedia.org/wiki/CVS">CVS</a> (Controle de versão), enfim, o livro é muito bom e recomendo a leitura!</p>
+
+<p>Tá, mas ainda não respondi a pergunta. Vamos lá, Padrões de Projeto são soluções documentadas para problemas recorrentes no desenvolvimento de software. Segundo o <a href="http://pt.wikipedia.org/wiki/Padr%C3%A3o_de_projeto_de_software">Wikipédia</a>:</p>
+
+<blockquote><p>“Um Padrão de Projeto de Software ou Padrão de Desenho de Software, também muito conhecido pelo termo original em inglês, Design Pattern, descreve uma solução geral reutilizável para um problema recorrente no desenvolvimento de sistemas de software orientados a objetos. Não é um código final, é uma descrição ou modelo de como resolver o problema do qual trata, que pode ser usada em muitas situações diferentes. Os Padrões de Projeto normalmente definem as relações e interações entre as classes ou objetos, sem especificar os detalhes das classes ou objetos envolvidos, ou seja, estão num nível de generalidade mais alto.”</p></blockquote>
+
+<p>Algo muito comum nos desenvolvedores PHP é a pressa para desenvolver. Arrisco dizer que não é nem o desenvolvedor que é apressado, mas os prazos dos projetos não nos dão espaço para pensar muito no que fazer e o desenvolvedor já vai logo cuspindo código antes de pensar nos problemas da implementação daquele determinado código, em quê aquela pequena alteração afeta o sistema. Claro que a experiência do desenvolvedor também influencia muito nisso.</p>
+
+<p>Bem, vamos logo ao que interessa!</p>
+
+<h2>Quais os padrões que existem?</h2>
+
+<p>Existem N padrões e esse número aumenta com o passar do tempo, pois a medida que os problemas vão acontecendo, também surgem novas soluções que podem ser documentadas, criando-se um padrão. Na verdade, muitos dos padrões que veremos podem até já estar sendo usados por vocês, mas vocês nem sabiam.</p>
+
+<p>Existem basicamente três tipos de padrões de projeto, são eles:</p>
+
+<ul>
+<li>Criacionais</li>
+<li>Estruturais</li>
+<li>Comportamentais</li>
+</ul>
+
+
+<p>Vamos começar pelos padrões criacionais. Aqui, iremos abordar esse padrões:</p>
+
+<ul>
+<li>Singleton</li>
+<li>Factory Method</li>
+<li>Abstract Factory</li>
+<li>Injeção de Dependência</li>
+</ul>
+
+
+<p>Esses são os padrões que mais gostei de conhecer e é sobre eles que vamou falar nos próximos posts.</p>
+
+<p>Até a próxima!</p>
+]]></content>
+  </entry>
+  
+</feed>

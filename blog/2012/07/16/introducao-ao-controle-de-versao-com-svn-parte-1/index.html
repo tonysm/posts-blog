@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Introdução ao Controle de Versão com SVN - parte 1 - Blog / luizantonio.me</title>
+  <meta name="author" content="Tony">
+
+  
+  <meta name="description" content="Bom, resolvi começar com um post que escrevi a algum tempo e postei esses dias no webmatinal. Vamos falar sobre controle de versão e, para &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tonyzrp.github.com/posts-blog/blog/2012/07/16/introducao-ao-controle-de-versao-com-svn-parte-1/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Blog / luizantonio.me" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-33381667-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Blog / luizantonio.me</a></h1>
+  
+    <h2>Por uma web mais limpa!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tonyzrp.github.com/posts-blog" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Introdução Ao Controle De Versão Com SVN - Parte 1</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-16T18:39:00-03:00" pubdate data-updated="true">Jul 16<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img src="/images/posts/header-svn-parte-1.png" title="Modelo de desenvolvimento centralizado" alt="Exemplo de desenvolvimento com SVN" /></p>
+
+<p>Bom, resolvi começar com um post que escrevi a algum tempo e postei esses dias no <a href="http://webmatinal.org/" title="WebMatinal">webmatinal</a>. Vamos falar sobre controle de versão e, para exemplificar, iremos utilizar o SVN pela linha de comando. Como usuário iniciante de Linux, venho tentando me adaptar ao ambiente já tem um tempo. Ainda sou muito noob, mas é assim mesmo.</p>
+
+<!-- more -->
+
+
+<p>Bom, sem mais lorotas, vamos ao que interessa. Uma das primeiras coisas (leia-se ferramentas) que tive contato logo quando comecei a estagiar/trabalhar com desenvolvimento foi o SVN. No começo, não entendia muito bem a coisa toda, achava que era só um lugar onde guardávamos o código. Leigo engano (e bota “leigo” nisso!). Com o tempo (e muitos conflitos de versão que explicarei mais adiante), percebi a verdadeira importância do controle de versão. Não é só um lugar onde nosso código fica. Achava isso por conta do modelo centralizado do SVN, onde é necessário um repositório central para guardar o código.</p>
+
+<p>Acho importante entender alguns conceitos, pois PRECISAMOS ter um bom controle do código que escrevemos. Não só código, como qualquer documento que produzimos precisa estar sob algum controle de versão. Digo “PRECISAMOS” pra enfatizar a necessidade da utilização de versionamento. Isso nos proporciona um histórico do desenvolvimento do software (ou arquivo). Segundo o wikipédia:</p>
+
+<blockquote><p>Um sistema de controle de versão (ou versionamento), <a href="http://en.wikipedia.org/wiki/Version_control_system" title="Modelo centralizado de Controle de Versão">VCS</a> (do inglês version control system) ou ainda SCM (do inglês source code management) na função prática da <a href="http://pt.wikipedia.org/wiki/Ci%C3%AAncia_da_Computa%C3%A7%C3%A3o" title="Ciência da Computação">Ciência da Computação</a> e da <a href="http://pt.wikipedia.org/wiki/Engenharia_de_Software" title="Engenharia de Software">Engenharia de Software</a>, é um <a href="http://pt.wikipedia.org/wiki/Software" title="Software">software</a> com a finalidade de gerenciar diferentes <a href="http://pt.wikipedia.org/wiki/Vers%C3%A3o" title="Versões de Software">versões</a> no desenvolvimento de um documento qualquer.</p></blockquote>
+
+<p>Para exemplos iremos utilizar o Subversion, ou <a href="http://pt.wikipedia.org/wiki/Subversion" title="SVN">SVN</a> (como já citei acima). Ele é um software de controle de versão centralizado, isso quer dizer que necessita de um repositório central para armazenar seu código. A ideia é essa:</p>
+
+<p><img src="/images/posts/controle-versao-svn-centralizado-300x280.png" title="Modelo de desenvolvimento centralizado" alt="Desenvolvimento com repositório central" /></p>
+
+<p>Essa imagem já nos traz dois dos principais comandos do SVN: <strong>commit</strong> e <strong>update</strong>. Para começar a falar dos comandos, vamos entender o que é uma working copy. Como já falamos, nosso código fica centralizado, ou seja, ele é armazenado em um servidor central. Para fazer as alterações no nosso código, precisamos primeiro baixar a última versão do código na nossa máquina para, então, efetuar as alterações e mandar de volta para o servidor. Quando baixamos o código do servidor para a nossa máquina, estamos criando uma “working copy”. Que fique claro que a maior parte do código no servidor deve ter sido testado!</p>
+
+<p>Vejamos agora alguns comandos:</p>
+
+<ul>
+<li><strong>checkout</strong>: Nada mais é do que criar uma working copy de um projeto do repositório na sua máquina (onde você irá desenvolver);</li>
+<li><strong>commit</strong>: Serve para mandar suas alterações para o repositório (como mostra a figura);</li>
+<li><strong>update</strong>: Atualiza sua working copy com o repositório. Ou seja, traz atualizações do repositório para a sua working copy;</li>
+<li><strong>status</strong>: Retorna o estado de seus arquivos na working copy, qualquer alteração nos arquivos na sua working copy  vão aparecer com esse comando;</li>
+<li><strong>add</strong>: Adiciona arquivos que não estão no repositório.</li>
+</ul>
+
+
+<p>Já conhecemos alguns dos principais comandos do SVN, vamos brincar um pouco com um exemplo. Não vou falar da instalação do SVN aqui, isso é assunto para outro post. Para exemplificar, digamos que eu tenha um repositório (lugar no servidor onde eu armazeno meu código) limpo, zerado, novinho em folha e quero começar a desenvolver o projeto. Qual a primeira coisa que devemos fazer?
+Respondeu certo que falou “o checkout”. Mas, vamos primeiro a estrutura padrão do repositório.</p>
+
+<ul>
+<li><strong>/</strong>    - raiz do repositório</li>
+<li><strong>/trunk/</strong>    - linha principal de desenvolvimento do repositório (local onde o código fica armazenado)</li>
+<li><strong>/tags/</strong>    - a medida que vamos desenvolvendo e implantando os softwares, versões são criadas. Essas devem ser armazenadas aqui.</li>
+<li><strong>/branches/</strong>    - local onde fica armazenado o código durante o desenvolvimento. Falaremos sobre branches é uma outra oportunidade.</li>
+</ul>
+
+
+<p>Vamos, então, fazer o checkout e começar a desenvolver nosso projeto. Para o exemplo, não iremos utilizar o conceito de branches, vamos trabalhar direto no trunk, pois, como disse, falaremos sobre branches mais adiante. O código para o checkout:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd /var/www/
+</span><span class='line'>$ svn checkout [URL do repositorio]/trunk nome\_da\_working\_copy</span></code></pre></td></tr></table></div></figure>
+
+
+<p>O diretório <strong>/var/www/</strong> é o diretório raiz do meu apache, onde estão os meus projetos. Primeiro eu vou pro meu diretório raiz e em seguinda uso o <em>“svn checkout”</em> se tudo estiver correto, o svn irá criar a pasta nome_da_working_copy no meu diretório de projetos, ficando assim: <strong>/var/www/nome_da_working_copy</strong>.</p>
+
+<p>Pronto! Já tenho uma cópia do projeto. Agora, crie um arquivo na sua <em>working copy</em> chamado <strong>README.txt</strong> e coloque um texto qualquer dentro deste arquivo. Uma vez feito isso, vamos verificar o estado da nossa working copy. Como fazemos isso? Com o comando <strong>status</strong>.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd /var/www/nome\_da\_working\_copy/
+</span><span class='line'>$ svn status</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Feito isso, o terminal deve retornar isso:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ ? README.txt</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Essa interrogação ai quer dizer que esse arquivo existe na sua <em>working copy</em>, mas não existe no repositório. Se fizermos o <strong>commit</strong> agora, nada será alterado no servido, ou seja, esse arquivo não será enviado para o repositório, porquê ele ainda não existe lá. Precisamos, então, adicionar esse arquivo no repositório. Para isso, utilizamos o comando <strong>add</strong>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd /var/www/nome\_da\_working\_copy/
+</span><span class='line'>$ svn add README.txt</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Agora, o SVN irá avisar que o arquivo foi adicionado ao servidor, mas ele ainda não pode ser encontrado lá, pois só existe na sua <em>working copy</em>. Terminadas as alterações, vamos fazer um <strong>commit</strong> e mandar essas alterações para o repositório. Esse comando é sempre utilizado com o parâmetro “-m” seguido de uma mensagem embrulhada por “”, como mostra o exemplo:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd /var/www/nome\_da\_working\_copy/
+</span><span class='line'>$ svn commit -m "criação do arquivo README.txt para descrição do projeto"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Pronto! Nosso arquivo README.txt agora está no repositório com nossas alterações. Digamos agora que outro desenvolvedor alterou esse arquivo (na <em>working copy</em> dele) e fez o commit com as alterações. Agora, você quer alterar esse arquivo novamente. Se você fizesse isso direto na sua <em>working copy</em> e fosse fazer um commit, daria erro, pois o seu arquivo está numa versão diferente do que se encontra no repositório. Isso é chamado de “conflito de versões”. Para alterar o arquivo, primeiro é necessário possuir a última versão do mesmo. Para isso, usamos o comando <strong>update</strong> antes de fazer qualquer alteração no arquivo. (<strong>atenção</strong>: esse comando deve ser executando antes de qualquer commit, os conflitos devem ocorrer na sua working copy, você resolve e manda pro servidor):</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd /var/www/nome\_da\_working\_copy/
+</span><span class='line'>$ svn update</span></code></pre></td></tr></table></div></figure>
+
+
+<p>O SVN nos trará a nova versão do arquivo README.txt. Agora, nós alteramos esse arquivo e adicionamos mais conteúdo. Ao fazer o <strong>status</strong> irá aparecer um “M” no lugar da “?” (interrogação), indicando que o arquivo foi alterado na sua <em>working copy</em>. Diferente da criação de um arquivo, na alteração não precisamos adicionar o arquivo ao repositório novamente. Basta apenas enviar as alterações. Para isso, vamos usar o <strong>commit</strong> novamente:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd /var/www/nome\_da\_working\_copy/
+</span><span class='line'>$ svn commit -m "alteração do arquivo README.txt para acrescentar mais conteúdo."</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Lembre-se sempre de descrever o commit na mensagem para que, posteriormente, possamos saber o que foi feito no commit apenas lendo a mensagem, sem ter que olhar quais arquivos foram alterados no commit e quais alterações foram feitas nesses arquivos.</p>
+
+<p>Bom, visto que é o meu primeiro post aqui, acho que já falei bastante, né?! (hehe) Mas por ora, ficamos por aqui. Espero não ter falado nenhuma bobeira por aqui, mas se falei, sintam-se à vontade para corrigir nos comentários. Nos vemos no próximo post, neste mesmo canal. (hehe)</p>
+
+<p>Até a próxima!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tony</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-16T18:39:00-03:00" pubdate data-updated="true">Jul 16<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/desenvolvimento/'>Desenvolvimento</a>, <a class='category' href='/blog/categories/subversion/'>subversion</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://tonyzrp.github.com/posts-blog/blog/2012/07/16/introducao-ao-controle-de-versao-com-svn-parte-1/" data-via="tonyzrp" data-counturl="http://tonyzrp.github.com/posts-blog/blog/2012/07/16/introducao-ao-controle-de-versao-com-svn-parte-1/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/07/14/ola/" title="Previous Post: Olá, mundo!">&laquo; Olá, mundo!</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/07/20/padroes-de-projeto-introducao/" title="Next Post: Padrões de Projeto - Introdução">Padrões de Projeto - Introdução &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/07/25/padroes-criacionais-factory-method/">Padrões Criacionais - Factory Method</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/20/padroes-criacionais-singleton/">Padrões Criacionais - Singleton</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/20/padroes-de-projeto-introducao/">Padrões de Projeto - Introdução</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/16/introducao-ao-controle-de-versao-com-svn-parte-1/">Introdução ao Controle de Versão com SVN - parte 1</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/14/ola/">Olá, mundo!</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/tonyzrp">@tonyzrp</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tonyzrp',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("tonyzrp", 4, true);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/tonyzrp" class="twitter-follow-button" data-show-count="false">Follow @tonyzrp</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Tony -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'blogluizantoniome';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tonyzrp.github.com/posts-blog/blog/2012/07/16/introducao-ao-controle-de-versao-com-svn-parte-1/';
+        var disqus_url = 'http://tonyzrp.github.com/posts-blog/blog/2012/07/16/introducao-ao-controle-de-versao-com-svn-parte-1/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Padrões Criacionais - Singleton - Blog / luizantonio.me</title>
+  <meta name="author" content="Tony">
+
+  
+  <meta name="description" content="Hoje vamos falar de um padrão muito legal, o Singleton. Esse padrão é muito usado e conhecido no mundo JAVA, mas não é muito aconselhado no ambiente &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-criacionais-singleton/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Blog / luizantonio.me" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-33381667-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Blog / luizantonio.me</a></h1>
+  
+    <h2>Por uma web mais limpa!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tonyzrp.github.com/posts-blog" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Padrões Criacionais - Singleton</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-20T13:14:00-03:00" pubdate data-updated="true">Jul 20<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Hoje vamos falar de um padrão muito legal, o Singleton. Esse padrão é muito usado e conhecido no mundo JAVA, mas não é muito aconselhado no ambiente web. O problema é o seguinte: Digamos que você queria que uma classe tenha uma e somente uma instância. Pois é, o singleton surge exatamente para garantir que isso aconteça.</p>
+
+<!-- more -->
+
+
+<h3>Mas, como assim uma instância? Qual o problema em ter mais de uma instância?</h3>
+
+<p>Digamos que você tenha uma classe de BancoDeDados. Essa classe estabelece uma conexão com o banco de dados e também é responsável por fechar essa conexão. Nessa classe também é possível forçar uma nova conexão.</p>
+
+<p>Vamos ver o código dessa classe:</p>
+
+<div><script src='https://gist.github.com/3151195.js?file=BancoDeDados.php'></script>
+<noscript><pre><code>&lt;?php
+/**
+ * BancoDeDados
+ * 
+ *  Essa classe estabelece uma conexão com o banco de dados e também 
+ *  é responsável por fechar essa conexão. Nessa classe também é possível forçar uma nova conexão.
+ *
+ * @author Luiz Messias &lt;tonyzrp@gmail.com&gt;
+ * 
+ */
+class BancoDeDados {
+    /**
+     * @static
+     * @var BancoDeDados
+     */
+    private static $instance;
+    /**
+     * @var PDO
+     */
+    private $conn;
+    /**
+     * __construct
+     * o construtor será privado para evitar que essa classe seja instanciada
+     *
+     * @return void
+     */
+    private function __construct(){
+        //qualquer implementação de construtor pode ser feita aqui
+        $this-&gt;conn = $this-&gt;PDOConnection();
+    }
+    /**
+     * PDOConnect
+     *
+     * @return PDO
+     */
+    private function PDOConnection(){
+        return new PDO(&quot;mysql:host=localhost;dbname=singleton&quot;, &quot;root&quot;, &quot;&quot;);
+    }
+    /**
+     * getInstance
+     *
+     * @static
+     * @return BancoDeDados
+     */
+    public static function getInstance(){
+        if(!isset(self::$instance))
+            self::$instance = new self();
+            
+        return self::$instance;
+    }
+    /**
+     * connect
+     *
+     * @return PDO
+     */
+    public function connect(){
+        return $this-&gt;conn;
+    }
+    /**
+     * forceReconnect
+     *  esse método força um reconnect na conexão do singleton, caso seja necessário
+     *
+     * @return PDO
+     */
+    public function forceReconnect(){
+        self::$instance-&gt;conn = $this-&gt;PDOConnection();
+        
+        return self::$instance-&gt;conn;
+    }
+}</code></pre></noscript></div>
+
+
+<p>Certo, vou tentar explicar essa classe.</p>
+
+<ul>
+<li><strong>linha 16</strong>: essa é a única instância da Classe Banco de Dados;</li>
+<li><strong>linha 20</strong>: A instância da class possui a conexão com o banco;</li>
+<li><strong>linha 27</strong>: O construtor foi escrito como <em>private</em> para que não seja possível instanciá-la;</li>
+<li><strong>linha 29</strong>: Como o construtor será executado apenas uma vez, essa conexão será única para a aplicação toda, a não ser que o cliente force uma nova conexão;</li>
+<li><strong>linha 36</strong>: Esse método simplesmente retorna uma nova conexão com o PDO;</li>
+<li><strong>linha 45</strong>: Como tornamos o construtor <em>private</em> precisamos de um ponto de acesso ao objeto, esse é o nosso ponto de acesso. Nesse método, verificamos se existe a instância. Se não existir, ela é criada. Sendo retornada logo em seguida.</li>
+<li><strong>linha 56</strong>: Método que o cliente usará para conectar-se conseguir uma conexão com o Banco.</li>
+<li><strong>linha 65</strong>: Método que força a conexão com o banco. Perceba que ele muda a conexão da instância do singleton. Todos os objetos dessa instância receberão essa nova conexão.</li>
+</ul>
+
+
+<p>Bom, é isso. Eu fiz um exemplo de código cliente com alguns testes, só é descomentar os testes para ver os retornos.</p>
+
+<p><strong>Lembrete</strong>: <strong>&#8221;==&#8221;</strong> em objetos retorna <em>true</em> se os objetos tem os mesmos atributos e valores e se forem instâncias da mesma classe. Já o <strong>&#8221;===&#8221;</strong> retorna <em>true</em> se, e somente se, forem instâncias do mesmo objeto.</p>
+
+<div><script src='https://gist.github.com/3151195.js?file=index.php'></script>
+<noscript><pre><code>&lt;?php
+
+    require &quot;BancoDeDados.php&quot;;
+    
+    $Banco = BancoDeDados::getInstance();
+    $Banco2 = BancoDeDados::getInstance();
+    
+    //var_dump($Banco === $Banco2); // output true
+    
+    $conn = $Banco-&gt;connect();
+    $conn2 = $Banco2-&gt;connect();
+    
+    //var_dump( $conn === $conn2 ); // output true
+    
+    //forçando o reconnect
+    $conn2 = $Banco2-&gt;forceReconnect();
+    
+    //var_dump( $conn === $conn2 ); // output false
+    
+    $Banco3 = BancoDeDados::getInstance();
+    
+    //var_dump(($Banco === $Banco3) &amp;&amp; ($Banco2 === $Banco3)); //output true
+    
+    $conn3 = $Banco3-&gt;connect();
+    
+    //var_dump($conn === $conn2); // output false
+    //var_dump($conn2 === $conn3); // output true
+    
+    $conn4 = $Banco-&gt;connect();
+    
+    //$conn e $conn4 foram recuperadas pelo mesmo objeto ($Banco), mas eu forcei o reconnect no singleton
+    //var_dump($conn === $conn4); //output false
+    //var_dump($conn2 === $conn4); //output true
+    //var_dump($conn3 === $conn4); //output true</code></pre></noscript></div>
+
+
+<p>É isso, espero ter ajudado alguém com isso. Se fiz alguma cagada aqui, podem descer o verbo nos comentários. (hehe)</p>
+
+<p>Até a próxima!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tony</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-20T13:14:00-03:00" pubdate data-updated="true">Jul 20<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/desenvolvimento/'>desenvolvimento</a>, <a class='category' href='/blog/categories/padrões-de-projeto/'>padrões de projeto</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-criacionais-singleton/" data-via="tonyzrp" data-counturl="http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-criacionais-singleton/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/07/20/padroes-de-projeto-introducao/" title="Previous Post: Padrões de Projeto - Introdução">&laquo; Padrões de Projeto - Introdução</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/07/25/padroes-criacionais-factory-method/" title="Next Post: Padrões Criacionais - Factory Method">Padrões Criacionais - Factory Method &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/07/25/padroes-criacionais-factory-method/">Padrões Criacionais - Factory Method</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/20/padroes-criacionais-singleton/">Padrões Criacionais - Singleton</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/20/padroes-de-projeto-introducao/">Padrões de Projeto - Introdução</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/16/introducao-ao-controle-de-versao-com-svn-parte-1/">Introdução ao Controle de Versão com SVN - parte 1</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/14/ola/">Olá, mundo!</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/tonyzrp">@tonyzrp</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tonyzrp',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("tonyzrp", 4, true);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/tonyzrp" class="twitter-follow-button" data-show-count="false">Follow @tonyzrp</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Tony -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'blogluizantoniome';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-criacionais-singleton/';
+        var disqus_url = 'http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-criacionais-singleton/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Padrões de Projeto - Introdução - Blog / luizantonio.me</title>
+  <meta name="author" content="Tony">
+
+  
+  <meta name="description" content="Olá, galera. Olha eu aqui mais uma vez pra falar de um tema que acho muito interessante: Padrões de Projeto! (ou “Design Patterns”, se preferir) Bom &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-de-projeto-introducao/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Blog / luizantonio.me" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-33381667-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Blog / luizantonio.me</a></h1>
+  
+    <h2>Por uma web mais limpa!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tonyzrp.github.com/posts-blog" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Padrões De Projeto - Introdução</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-20T11:56:00-03:00" pubdate data-updated="true">Jul 20<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Olá, galera. Olha eu aqui mais uma vez pra falar de um tema que acho muito interessante: Padrões de Projeto! (ou “Design Patterns”, se preferir) Bom, esse é um tema muito conhecido por programadores JAVA, mas adivinha só, não é apenas em JAVA que podemos aplicar esses padrões, eles podem ser aplicados perfeitamente em PHP ou qualquer outra linguagem com suporte a orientação a objetos, acredito eu. Claro, existem exceções, mas não vamos falar sobre isso agora.</p>
+
+<p>Estou estudando Padrões de Projeto e pra aprender mais, resolvi tentar descrever os padrões como os entendi. Por isso, posso estar errado em alguma colocação. Ou seja, os comentários são bem vindos! Mal posso esperar pelos debates nos comentários! (hehe)</p>
+
+<!-- more -->
+
+
+<p>Só pra lembrar que os códigos apresentados aqui estão no meu github, nesse repositório <a href="https://github.com/tonyzrp/posts-blog">aqui</a>.</p>
+
+<h2>O que são esses Padrões de Projeto?</h2>
+
+<p>Outro dia comprei um livro muito legal (esse <a href="http://www.linuxmall.com.br/produto/livro-objetos-php-padroes-e-pratica.html" title="link do livro no linuxmall">aqui</a>) que mostra vários padrões de projeto, assim como fala sobre <a href="http://phpunit.sourceforge.net/">PHPUnit</a> (testes automatizados), <a href="http://www.phpdoc.org/">PHPDoc</a> (documentação de código), <a href="http://pt.wikipedia.org/wiki/CVS">CVS</a> (Controle de versão), enfim, o livro é muito bom e recomendo a leitura!</p>
+
+<p>Tá, mas ainda não respondi a pergunta. Vamos lá, Padrões de Projeto são soluções documentadas para problemas recorrentes no desenvolvimento de software. Segundo o <a href="http://pt.wikipedia.org/wiki/Padr%C3%A3o_de_projeto_de_software">Wikipédia</a>:</p>
+
+<blockquote><p>“Um Padrão de Projeto de Software ou Padrão de Desenho de Software, também muito conhecido pelo termo original em inglês, Design Pattern, descreve uma solução geral reutilizável para um problema recorrente no desenvolvimento de sistemas de software orientados a objetos. Não é um código final, é uma descrição ou modelo de como resolver o problema do qual trata, que pode ser usada em muitas situações diferentes. Os Padrões de Projeto normalmente definem as relações e interações entre as classes ou objetos, sem especificar os detalhes das classes ou objetos envolvidos, ou seja, estão num nível de generalidade mais alto.”</p></blockquote>
+
+<p>Algo muito comum nos desenvolvedores PHP é a pressa para desenvolver. Arrisco dizer que não é nem o desenvolvedor que é apressado, mas os prazos dos projetos não nos dão espaço para pensar muito no que fazer e o desenvolvedor já vai logo cuspindo código antes de pensar nos problemas da implementação daquele determinado código, em quê aquela pequena alteração afeta o sistema. Claro que a experiência do desenvolvedor também influencia muito nisso.</p>
+
+<p>Bem, vamos logo ao que interessa!</p>
+
+<h2>Quais os padrões que existem?</h2>
+
+<p>Existem N padrões e esse número aumenta com o passar do tempo, pois a medida que os problemas vão acontecendo, também surgem novas soluções que podem ser documentadas, criando-se um padrão. Na verdade, muitos dos padrões que veremos podem até já estar sendo usados por vocês, mas vocês nem sabiam.</p>
+
+<p>Existem basicamente três tipos de padrões de projeto, são eles:</p>
+
+<ul>
+<li>Criacionais</li>
+<li>Estruturais</li>
+<li>Comportamentais</li>
+</ul>
+
+
+<p>Vamos começar pelos padrões criacionais. Aqui, iremos abordar esse padrões:</p>
+
+<ul>
+<li>Singleton</li>
+<li>Factory Method</li>
+<li>Abstract Factory</li>
+<li>Injeção de Dependência</li>
+</ul>
+
+
+<p>Esses são os padrões que mais gostei de conhecer e é sobre eles que vamou falar nos próximos posts.</p>
+
+<p>Até a próxima!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tony</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-20T11:56:00-03:00" pubdate data-updated="true">Jul 20<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/desenvolvimento/'>desenvolvimento</a>, <a class='category' href='/blog/categories/padrões-de-projeto/'>padrões de projeto</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-de-projeto-introducao/" data-via="tonyzrp" data-counturl="http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-de-projeto-introducao/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/07/16/introducao-ao-controle-de-versao-com-svn-parte-1/" title="Previous Post: Introdução ao Controle de Versão com SVN - parte 1">&laquo; Introdução ao Controle de Versão com SVN - parte 1</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/07/20/padroes-criacionais-singleton/" title="Next Post: Padrões Criacionais - Singleton">Padrões Criacionais - Singleton &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/07/25/padroes-criacionais-factory-method/">Padrões Criacionais - Factory Method</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/20/padroes-criacionais-singleton/">Padrões Criacionais - Singleton</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/20/padroes-de-projeto-introducao/">Padrões de Projeto - Introdução</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/16/introducao-ao-controle-de-versao-com-svn-parte-1/">Introdução ao Controle de Versão com SVN - parte 1</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/14/ola/">Olá, mundo!</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/tonyzrp">@tonyzrp</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tonyzrp',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("tonyzrp", 4, true);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/tonyzrp" class="twitter-follow-button" data-show-count="false">Follow @tonyzrp</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Tony -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'blogluizantoniome';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-de-projeto-introducao/';
+        var disqus_url = 'http://tonyzrp.github.com/posts-blog/blog/2012/07/20/padroes-de-projeto-introducao/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
