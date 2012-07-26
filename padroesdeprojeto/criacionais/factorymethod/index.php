@@ -1,10 +1,19 @@
 <?php
 
-require_once "carros/LivroFactory.php";
+require_once "livros/EditoraAbril.php";
+require_once "livros/EditoraNovatec.php";
 
-// simulamos a passagem de id
-$volta = LivroFactory::getLivro(1);
-// output: Título: A Volta dos que nao foram; autor: Fulano da Tal; Classe: VoltaDosQueNaoForam
+// editora abril
+$abril = new EditoraAbril();
+$abril->publicar("costura");
 
-$sorte = LivroFactory::getLivro(2);
-// output: Título: Estou com sorte; autor: Fulano da Silva; Classe: EstouComSorte
+$abril->publicar("culinaria");
+
+$abril->publicar("disney");
+
+// outra editora
+$novatec = new EditoraNovatec();
+
+$novatec->publicar("jogos");
+
+$novatec->publicar("php");
