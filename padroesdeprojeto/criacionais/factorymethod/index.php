@@ -25,3 +25,32 @@ $php = $novatec->publicar("php");
 echo get_class($php) . "\n";
 echo get_class($jogos) . "\n";
 echo get_class($disney) . "\n";
+
+/**
+*	output desse exemplo
+*	
+*	Escrevendo livro Costura
+*	Encapando livro Costura
+*	Publicando livro Costura
+*	------------------
+*	Escrevendo livro Culinaria
+*	Encapando livro Culinaria
+*	Publicando livro Culinaria
+*	------------------
+*	Escrevendo livro Disney
+* 	Encapando livro Disney
+*	Publicando livro Disney
+*	------------------
+*	Escrevendo livro Blender 3D
+*	Encapando livro Blender 3D
+*	Publicando livro Blender 3D
+*	------------------
+*	Escrevendo livro PHP OO
+*	Encapando livro PHP OO
+*	Publicando livro PHP OO
+*	------------------
+*	PhpOoLivro
+*	Blender3dLivro
+*	DisneyLivro
+*
+*/
